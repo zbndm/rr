@@ -53,7 +53,6 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
         call: [],
         installer: [],
         netlog: [],
-        trace: [],
         mobile: [],
       },
       loadingMessage: '',
@@ -108,7 +107,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
     if (noFiles && !cachePath) {
       showMessageBox({
         title: 'Huh, weird logs!',
-        message: 'Sorry, Sleuth does not understand the file(s). It seems like there are no Slack logs here.\n\nCheck the #sleuth FAQ for help!',
+        message: 'Sorry, Sleuth does not understand the files. It seems like there are no Slack logs here.',
         type: 'error'
       });
 
@@ -116,7 +115,7 @@ export class CoreApplication extends React.Component<CoreAppProps, Partial<CoreA
       window.location.reload();
     }
 
-    this.addFilesToState(sortedUnzippedFiles, 'state', 'netlog', 'trace');
+    this.addFilesToState(sortedUnzippedFiles, 'state', 'netlog');
 
     console.log(this.state!.processedLogFiles!.state);
 

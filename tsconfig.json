@@ -31,8 +31,7 @@
     "baseUrl": "."
   },
   "include": [
-    "src/**/*",
-    "./jest-setup.ts"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules"

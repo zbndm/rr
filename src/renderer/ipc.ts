@@ -5,15 +5,11 @@ import { ICON_NAMES } from '../shared-constants';
 // listen to IPC events.
 
 
-type name = 'home' | 'appData' | 'userData' | 'cache' | 'temp' | 'exe' | 'module' | 'desktop' | 'documents' | 'downloads' | 'music' | 'pictures' | 'videos' | 'logs';
+type name = 'home' | 'appData' | 'userData' | 'cache' | 'temp' | 'exe' | 'module' | 'desktop' | 'documents' | 'downloads' | 'music' | 'pictures' | 'videos' | 'logs' | 'pepperFlashSystemPlugin';
 export function getPath(
   path: name
 ): Promise<string> {
   return ipcRenderer.invoke('get-path', path);
-}
-
-export function getUserAgent(): Promise<string> {
-  return ipcRenderer.invoke('get-user-agent');
 }
 
 export function sendWindowReady() {

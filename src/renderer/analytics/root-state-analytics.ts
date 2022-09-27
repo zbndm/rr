@@ -11,7 +11,7 @@ export function getRootStateWarnings(file: UnzippedFile): Array<string> {
 
   if (data.settings) {
     const { releaseChannelOverride } = data.settings;
-    if (releaseChannelOverride !== 'prod' && releaseChannelOverride !== null) {
+    if (releaseChannelOverride !== 'prod') {
       result.push(`Release channel is set to ${releaseChannelOverride}`);
     }
   }

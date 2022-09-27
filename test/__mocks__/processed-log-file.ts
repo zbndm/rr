@@ -1,8 +1,6 @@
-import { ProcessedLogFile, LogType } from '../../src/interfaces';
+import { ProcessedLogFile, LogType } from '../../src/renderer/interfaces';
 
 export const mockBrowserFile1: ProcessedLogFile = {
-  id: '123',
-  repeatedCounts: {},
   logEntries: [
     {
       index: 0,
@@ -34,8 +32,6 @@ export const mockBrowserFile1: ProcessedLogFile = {
     }
   ],
   logFile: {
-    id: '123',
-    type: 'UnzippedFile',
     fileName: 'browser.log',
     fullPath: '/mock/path/browser.log',
     size: 100
@@ -47,8 +43,6 @@ export const mockBrowserFile1: ProcessedLogFile = {
 
 // Slightly different timestamps
 export const mockBrowserFile2: ProcessedLogFile = {
-  id: '123',
-  repeatedCounts: {},
   logEntries: [
     {
       index: 0,
@@ -80,8 +74,6 @@ export const mockBrowserFile2: ProcessedLogFile = {
     }
   ],
   logFile: {
-    id: '123',
-    type: 'UnzippedFile',
     fileName: 'browser1.log',
     fullPath: '/mock/path/browser1.log',
     size: 100

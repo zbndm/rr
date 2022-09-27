@@ -1,5 +1,5 @@
 export const config = {
-  pantryUrl: 'https://slack-pantry.tinyspeck.com',
+  cooperUrl: 'https://desktop-build-bot.herokuapp.com',
   teamName: 'tinyspeck',
   isDevMode: process.execPath.match(/[\\/]electron/)
 };

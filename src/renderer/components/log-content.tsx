@@ -12,8 +12,6 @@ import { getFontForCSS } from './preferences-font';
 import { getTypeForFile } from '../processor';
 import { NetLogView } from './net-log-view';
 import { ToolView } from './tool-view';
-import { LogTimeView } from './log-time-view';
-import { DevtoolsView } from './devtools-view';
 
 export interface LogContentProps {
   state: SleuthState;
@@ -47,6 +45,7 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
       search,
       dateTimeFormat,
       font,
+      isDetailsVisible,
       showOnlySearchResults,
       searchIndex,
       dateRange,
@@ -55,13 +54,14 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
 
     if (!selectedLogFile) return null;
     const isLog = isLogFile(selectedLogFile);
+    const tableStyle = isDetailsVisible ? { height: this.state.tableHeight } : { flexGrow: 1 };
     const scrubber = <Scrubber elementSelector='LogTableContainer' onResizeHandler={this.resizeHandler} />;
 
     // In most cases, we're dealing with a log file
     if (isLog) {
       return (
         <div className='LogContent' style={{ fontFamily: getFontForCSS(font) }}>
-          <div id='LogTableContainer' style={{ height: this.state.tableHeight }}>
+          <div id='LogTableContainer' style={tableStyle}>
             <LogTable
               state={this.props.state}
               dateTimeFormat={dateTimeFormat}
@@ -74,9 +74,8 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
               selectedEntry={selectedEntry}
             />
           </div>
-          {scrubber}
+          {isDetailsVisible ? scrubber : null}
           <LogLineDetails state={this.props.state} />
-          <LogTimeView state={this.props.state} />
         </div>
       );
     }
@@ -87,8 +86,6 @@ export class LogContent extends React.Component<LogContentProps, Partial<LogCont
 
       if (logType === LogType.NETLOG) {
         return <NetLogView file={selectedLogFile} state={this.props.state} />;
-      } else if (logType === LogType.TRACE) {
-        return <DevtoolsView file={selectedLogFile} state={this.props.state} />;
       }
     }
 

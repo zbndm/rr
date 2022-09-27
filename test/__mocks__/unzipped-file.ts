@@ -1,8 +1,6 @@
-import { UnzippedFile } from '../../src/interfaces';
+import { UnzippedFile } from '../../src/renderer/unzip';
 
 export const fakeUnzippedFile: UnzippedFile = {
-  type: 'UnzippedFile',
-  id: '123',
   fileName: 'test',
   size: 12345,
   fullPath: '/test/hi'

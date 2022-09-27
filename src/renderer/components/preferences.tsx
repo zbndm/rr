@@ -6,9 +6,9 @@ import { SleuthState } from '../state/sleuth';
 import classNames from 'classnames';
 import React from 'react';
 import autoBind from 'react-autobind';
-import {format as dateFormatter} from 'date-fns';
 
 import { getSleuth } from '../sleuth';
+import { CooperSignInOutButton } from './cooper/sign-in-out-button';
 import { renderFontItem, filterFont, FONTS } from './preferences-font';
 import { filterDateTime, renderDateTimeItem, DATE_TIME_FORMATS } from './preferences-datetime';
 import { renderEditorItem, Editor, EDITORS, nameForCmd } from './preferences-editor';
@@ -77,7 +77,7 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
           <Divider />
           <FormGroup
             inline={true}
-            label='Date time format'
+            label='Date Time Format'
             helperText='Choose a custom format for dates to override how timestamps will be displayed'
           >
             <DateTimeSelect
@@ -88,14 +88,14 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
               onItemSelect={this.onDateTimeSelect}
               popoverProps={{ minimal: true }}
             >
-              <Button text={dateFormatter(1647029957123, dateTimeFormat)} rightIcon='calendar' />
+              <Button text={dateTimeFormat} rightIcon='calendar' />
             </DateTimeSelect>
           </FormGroup>
           <Divider />
           <FormGroup
             inline={true}
-            label='Sort direction'
-            helperText='Sort logs by oldest (ascending) or newest (descending)'
+            label='Sort Direction'
+            helperText='Skip home screen and always open most recent file automatically'
           >
             <RadioGroup
               onChange={(event) => (this.props.state.defaultSort = event.currentTarget.value as SORT_DIRECTION)}
@@ -158,7 +158,7 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
           <FormGroup
             inline={true}
             label='Use the Mark Christian™️ icon'
-            helperText='Mark did some art and made a special Sleuth icon. Requires a restart'
+            helperText='Mark did some art and made a special Sleuth icon. Requires a restart.'
           >
             <Checkbox
               checked={this.props.state.isMarkIcon}
@@ -166,8 +166,22 @@ export class Preferences extends React.Component<PreferencesProps, Partial<Prefe
               onChange={(event) => (this.props.state.isMarkIcon = event.currentTarget.checked)}
             />
           </FormGroup>
+          <Divider />
+          {this.renderCooperOptions()}
         </div>
       </Overlay>
+    );
+  }
+
+  private renderCooperOptions() {
+    return (
+      <FormGroup
+        inline={true}
+        helperText='The log service allows Slack employees to leave comments and hints for log entries'
+        label='Sign into the Cooper Log Service'
+      >
+        <CooperSignInOutButton state={this.props.state} />
+      </FormGroup>
     );
   }
 

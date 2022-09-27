@@ -21,16 +21,13 @@ import {
   UnzippedFile,
   SelectableLogFile,
   ProcessedLogFiles,
-  SerializedBookmark,
-  TimeBucketedLogMetrics
+  SerializedBookmark
 } from '../../interfaces';
-import { getInitialTimeViewRange, getTimeBuckedLogMetrics } from './time-view';
 import { rehydrateBookmarks, importBookmarks } from './bookmarks';
 import { copy } from './copy';
 import { changeIcon } from '../ipc';
 import { ICON_NAMES, STATE_IPC } from '../../shared-constants';
 import { setupTouchBarAutoruns } from './touchbar';
-import { RendererDescription } from '../processor/trace';
 
 const debug = require('debug')('sleuth:state');
 export const defaults = {
@@ -43,6 +40,10 @@ export const defaults = {
 };
 
 export class SleuthState {
+  // ** Cooper log line logging **
+  @observable public slackUserId?: string;
+  @observable public isCooperSignedIn = false;
+
   // ** Log file selection **
   // The selected log entry (single log message plus meta data)
   @observable public selectedEntry?: LogEntry;
@@ -53,8 +54,6 @@ export class SleuthState {
   // All the entries in the range. Let's hope this isn't horribly slow.
   // We should only over change the whole array.
   @observable.ref public selectedRangeEntries?: Array<LogEntry>;
-  // The custom range of the log time view
-  @observable public customTimeViewRange: number | undefined;
   // Path to the source directory (zip file, folder path, etc)
   @observable public source?: string;
   // A reference to the selected log file
@@ -90,8 +89,6 @@ export class SleuthState {
   @observable.shallow public bookmarks: Array<Bookmark> = [];
   @observable public serializedBookmarks: Record<string, Array<SerializedBookmark>>
     = this.retrieve('serializedBookmarks', true) as Record<string, Array<SerializedBookmark>> || {};
-  // ** Profiler **
-  @observable public rendererThreads: Array<RendererDescription> | undefined;
 
   // ** Settings **
   @observable public isDarkMode: boolean = !!this.retrieve('isDarkMode', true);
@@ -194,10 +191,6 @@ export class SleuthState {
     }
   }
 
-  @computed get isLogViewVisible() {
-    return !this.isDetailsVisible;
-  }
-
   /**
    * Return the file name of the currently selected file.
    *
@@ -208,19 +201,6 @@ export class SleuthState {
     return this.selectedLogFile
       ? getFileName(this.selectedLogFile)
       : '';
-  }
-
-  @computed
-  public get initialTimeViewRange(): number {
-    return this.selectedLogFile ? getInitialTimeViewRange(this.selectedLogFile) : 0;
-  }
-
-  @computed
-  public get timeBucketedLogMetrics(): TimeBucketedLogMetrics {
-    const range = this.customTimeViewRange || this.initialTimeViewRange;
-    return this.selectedLogFile
-      ? getTimeBuckedLogMetrics(this.selectedLogFile, range)
-      : {};
   }
 
   @action
@@ -291,7 +271,6 @@ export class SleuthState {
     this.cachePath = undefined;
     this.selectedCacheKey = undefined;
     this.isLoadingCacheKeys = false;
-    this.rendererThreads = undefined;
 
     if (goBackToHome) {
       this.resetApp();
@@ -311,7 +290,6 @@ export class SleuthState {
     this.selectedRangeEntries = undefined;
     this.selectedRangeIndex = undefined;
     this.selectedIndex = undefined;
-    this.customTimeViewRange = undefined;
 
     if (!logFile && logType) {
       debug(`Selecting log type ${logType}`);

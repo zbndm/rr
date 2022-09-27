@@ -9,7 +9,6 @@ export type LogFile = MergedLogFile | ProcessedLogFile;
 export type RepeatedCounts = Record<string, number>;
 
 export const enum LogType {
-  TRACE = 'trace',
   BROWSER = 'browser',
   RENDERER = 'renderer',
   CALL = 'call',
@@ -140,7 +139,6 @@ export interface ProcessedLogFiles {
   state: Array<UnzippedFile>;
   call: Array<ProcessedLogFile>;
   netlog: Array<UnzippedFile>;
-  trace: Array<UnzippedFile>;
   installer: Array<UnzippedFile>;
   mobile: Array<UnzippedFile>;
 }
@@ -160,7 +158,6 @@ export interface SortedUnzippedFiles {
   state: Array<UnzippedFile>;
   call: Array<UnzippedFile>;
   netlog: Array<UnzippedFile>;
-  trace: Array<UnzippedFile>;
   installer: Array<UnzippedFile>;
   mobile: Array<UnzippedFile>;
 }
@@ -180,16 +177,6 @@ export interface Suggestion extends fs.Stats {
   filePath: string;
   birthtimeMs: number;
 }
-
-export enum LogLevel {
-  info = 'info',
-  error = 'error',
-  warn = 'warn',
-  debug = 'debug'
-}
-
-export type LogMetrics = Record<LogLevel, number>;
-export type TimeBucketedLogMetrics = Record<number, LogMetrics>;
 
 export interface LevelFilter {
   error: boolean;

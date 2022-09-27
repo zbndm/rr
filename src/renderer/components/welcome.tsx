@@ -1,7 +1,7 @@
 import React from 'react';
 import path from 'path';
 
-import { ControlGroup, Button, InputGroup, Tooltip} from '@blueprintjs/core';
+import { ControlGroup, Button, InputGroup } from '@blueprintjs/core';
 import { observer } from 'mobx-react';
 
 import { getSleuth } from '../sleuth';
@@ -40,7 +40,7 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
 
   public renderSuggestions(): JSX.Element | null {
     const { openFile } = this.props.state;
-    const suggestions = this.props.state.suggestions || [];
+    const suggestions = this.props.state.suggestions || {};
     const elements = suggestions
       .map((file) => {
         const stats = file;
@@ -54,33 +54,29 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
         );
 
         return (
-          <li key={basename}>
-            <ControlGroup className='Suggestion' fill={true}>
-              <Tooltip content={basename.length > 38 ? basename : ''} hoverOpenDelay={800}>
-                <Button
-                  className='OpenButton'
-                  alignText='left'
-                  onClick={() => openFile(file.filePath)}
-                  icon='document'
-                >
-                  {basename}
-                </Button>
-              </Tooltip>
-              <InputGroup
-                leftIcon='time'
-                defaultValue={`${stats.age} old`}
-                readOnly={true}
-                rightElement={deleteElement}
-              />
-            </ControlGroup>
-          </li>
+          <ControlGroup className='Suggestion' fill={true} key={basename}>
+            <Button
+              className='OpenButton'
+              alignText='left'
+              onClick={() => openFile(file.filePath)}
+              icon='document'
+            >
+              {basename}
+            </Button>
+            <InputGroup
+              leftIcon='time'
+              defaultValue={`${stats.age} old`}
+              readOnly={true}
+              rightElement={deleteElement}
+            />
+          </ControlGroup>
         );
       });
 
     if (elements.length > 0) {
       return (
         <div className='Suggestions'>
-          <ul className='bp3-list-unstyled'>{elements}</ul>
+          <ul>{elements}</ul>
           {this.renderDeleteAll()}
         </div>
       );
@@ -90,15 +86,16 @@ export class Welcome extends React.Component<WelcomeProps, Partial<WelcomeState>
   }
 
   public renderDeleteAll(): JSX.Element | null {
-    const suggestions = this.props.state.suggestions || [];
+    const suggestions = this.props.state.suggestions || {};
 
     // Do we have any files older than 48 hours?
     const twoDaysAgo = Date.now() - 172800000;
     const toDeleteAll: Array<string> = [];
 
-    suggestions.forEach((item) => {
-      if (isBefore(item.mtimeMs, twoDaysAgo)) {
-        toDeleteAll.push(item.filePath);
+    Object.keys(suggestions).forEach((key) => {
+      const item = suggestions[key];
+      if (isBefore(item.atimeMs, twoDaysAgo)) {
+        toDeleteAll.push(key);
       }
     });
 

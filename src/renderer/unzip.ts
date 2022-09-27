@@ -1,7 +1,6 @@
 import yauzl from 'yauzl';
 import fs from 'fs-extra';
 import path from 'path';
-import * as stream from 'stream';
 import tmp from 'tmp';
 import { promisify } from 'util';
 
@@ -9,7 +8,6 @@ import { shouldIgnoreFile } from '../utils/should-ignore-file';
 import { UnzippedFile } from '../interfaces';
 
 const debug = require('debug')('sleuth:unzip');
-const pipeline = promisify(stream.pipeline);
 
 export interface YauzlZipEntry {
   fileName: string;
@@ -76,39 +74,35 @@ export class Unzipper {
     return fs.ensureDir(path.join(this.output, entry.fileName));
   }
 
-  public async handleFile(entry: YauzlZipEntry): Promise<any> {
-    const targetPath = path.join(this.output, entry.fileName);
+  public handleFile(entry: YauzlZipEntry): Promise<any> {
+    return new Promise<void>((resolve, reject) => {
+      const targetPath = path.join(this.output, entry.fileName);
 
-    debug(`Found file: ${entry.fileName}, Size: ${entry.compressedSize}.`);
+      debug(`Found file: ${entry.fileName}, Size: ${entry.compressedSize}.`);
 
-    if (shouldIgnoreFile(entry.fileName)) return;
+      if (shouldIgnoreFile(entry.fileName)) return;
 
-    // Ensure the parent directory is created
-    const dir = path.dirname(targetPath);
-    await fs.mkdirp(dir);
-
-    const readStream = await new Promise<NodeJS.ReadableStream>((resolve, reject) => {
-      this.zipfile.openReadStream(entry, async (error: Error, zipStream: NodeJS.ReadableStream) => {
+      this.zipfile.openReadStream(entry, async (error: Error, readStream: NodeJS.ReadableStream) => {
         if (error) {
           debug(`Encountered error while trying to read stream for ${entry.fileName}`);
           return reject(error);
         }
 
-        resolve(zipStream);
+        readStream.pipe(fs.createWriteStream(targetPath));
+        readStream.once('end', () => {
+          this.files.push({
+            fileName: entry.fileName,
+            size: entry.uncompressedSize || 0,
+            fullPath: targetPath,
+            id: targetPath,
+            type: 'UnzippedFile'
+          });
+
+          debug(`Successfully unzipped ${entry.fileName} to ${targetPath}`);
+          resolve();
+        });
       });
     });
-
-    await pipeline(readStream, fs.createWriteStream(targetPath));
-
-    this.files.push({
-      fileName: entry.fileName,
-      size: entry.uncompressedSize || 0,
-      fullPath: targetPath,
-      id: targetPath,
-      type: 'UnzippedFile'
-    });
-
-    debug(`Successfully unzipped ${entry.fileName} to ${targetPath}`);
   }
 
   public async handleEntry(entry: YauzlZipEntry) {

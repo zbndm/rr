@@ -140,17 +140,11 @@ export function getMenuTemplate(options: MenuTemplateOptions) {
             shell.openExternal('https://slack-pde.slack.com/archives/C8EH27UDT');
           }
         }, {
-          label: 'FAQ',
-          click() {
-            shell.openExternal('https://corp.quip.com/feaLAxYxU4st/Sleuth-FAQ');
-          }
-        },
-        {
           type: 'separator'
         }, {
           label: 'GitHub Repository',
           click() {
-            shell.openExternal('https://github.com/tinyspeck/sleuth');
+            shell.openExternal('https://github.com/felixrieseberg/sleuth');
           }
         }
       ]

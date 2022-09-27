@@ -13,13 +13,11 @@ export class IpcManager {
     this.setupMessageBoxHandler();
     this.setupWindowReady();
     this.setupGetPath();
-    this.setupGetUserAgent();
     this.setupSettings();
     this.setupOpenDialog();
     this.setupSaveDialog();
     this.setupCopy();
     this.setupQuit();
-    this.setupOpenRecent();
   }
 
   public openFile(pathName: string) {
@@ -90,16 +88,10 @@ export class IpcManager {
   }
 
   private setupGetPath() {
-    type name = 'home' | 'appData' | 'userData' | 'cache' | 'temp' | 'exe' | 'module' | 'desktop' | 'documents' | 'downloads' | 'music' | 'pictures' | 'videos' | 'logs';
+    type name = 'home' | 'appData' | 'userData' | 'cache' | 'temp' | 'exe' | 'module' | 'desktop' | 'documents' | 'downloads' | 'music' | 'pictures' | 'videos' | 'logs' | 'pepperFlashSystemPlugin';
 
     ipcMain.handle('get-path', (_event, pathName: name) => {
       return app.getPath(pathName);
-    });
-  }
-
-  private setupGetUserAgent() {
-    ipcMain.handle('get-user-agent', (_event) => {
-      return `sleuth/${app.getVersion()}`;
     });
   }
 
@@ -148,12 +140,6 @@ export class IpcManager {
 
   private setupQuit() {
     ipcMain.handle('quit', () => app.quit());
-  }
-
-  private setupOpenRecent() {
-    ipcMain.on('add-recent-file', (_event, filename) => {
-      app.addRecentDocument(filename);
-    });
   }
 }
 

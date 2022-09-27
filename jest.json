@@ -1,22 +1,25 @@
 {
   "transform": {
-    "\\.(js|jsx|ts|tsx)$": "ts-jest"
+    ".(js|jsx|ts|tsx)": "ts-jest"
   },
   "testEnvironment": "jsdom",
   "testURL": "http://localhost",
-  "testMatch": ["**/test/**/*.test.ts?(x)"],
+  "setupFilesAfterEnv": [
+    "<rootDir>/test/setup.ts"
+  ],
+  "testRegex": "(-test)\\.(ts|tsx)$",
   "bail": true,
   "resetMocks": true,
   "resetModules": true,
-  "modulePathIgnorePatterns": [
-    "/catapult"
-  ],
   "moduleFileExtensions": [
     "js",
     "jsx",
     "json",
     "ts",
     "tsx"
+  ],
+  "setupFiles": [
+    "raf/polyfill"
   ],
   "testPathIgnorePatterns": [
     "/.tmp/",
@@ -37,6 +40,5 @@
     "/node_modules/",
     "/test/.*\\.(ts|js)$",
     "/catapult"
-  ],
-  "setupFilesAfterEnv": ["<rootDir>/jest-setup.ts"]
+  ]
 }

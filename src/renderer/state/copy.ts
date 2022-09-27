@@ -1,7 +1,6 @@
 import { clipboard } from 'electron';
 import { SleuthState } from './sleuth';
 import { LogEntry } from '../../interfaces';
-import { format } from 'date-fns';
 
 /**
  * Performs a copy operation. Returns true if it did something,
@@ -29,13 +28,7 @@ export function copy(state: SleuthState): boolean {
 }
 
 function getCopyText(entry: LogEntry) {
-  const { message, meta } = entry;
-  let { timestamp } = entry;
-
-  // Android log timestamps look like this: Thu Jul 15 2021 13:14:58 GMT-0700 (Pacific Daylight Time)
-  // Might as well reformat all timestamps to be consistent with m/dd/yy, hh:mm:ss
-  timestamp = format(new Date(timestamp), 'M/dd/yy, HH:mm:ss');
-
+  const { message, meta, timestamp } = entry;
   let text = `${timestamp} ${message}`;
 
   if (meta) {

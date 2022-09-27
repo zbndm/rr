@@ -10,7 +10,6 @@ import { isProcessedLogFile } from '../../utils/is-logfile';
 import { countExcessiveRepeats } from '../../utils/count-excessive-repeats';
 import { plural } from '../../utils/pluralize';
 import { getRootStateWarnings } from '../analytics/root-state-analytics';
-import { getTraceWarnings } from '../analytics/trace-analytics';
 
 export interface SidebarProps {
   selectedLogFileName: string;
@@ -28,7 +27,6 @@ const enum NODE_ID {
   BROWSER = 'browser',
   RENDERER = 'renderer',
   PRELOAD = 'preload',
-  TRACE = 'trace',
   WEBAPP = 'webapp',
   CALLS = 'calls',
   INSTALLER = 'installer',
@@ -60,15 +58,7 @@ const DEFAULT_NODES: Array<ITreeNode> = [
     childNodes: [],
     nodeData: { type: 'browser' }
   }, {
-    id: NODE_ID.TRACE,
-    hasCaret: true,
-    icon: 'applications',
-    label: 'Trace',
-    isExpanded: true,
-    childNodes: [],
-    nodeData: { type: 'trace' }
-  }, {
-    id: NODE_ID.RENDERER,
+    id: 'renderer',
     hasCaret: true,
     icon: 'applications',
     label: 'Renderer Process',
@@ -142,7 +132,6 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     Sidebar.setChildNodes(NODE_ID.INSTALLER, state, processedLogFiles.installer.map((file) => Sidebar.getInstallerFileNode(file, props)));
     Sidebar.setChildNodes(NODE_ID.NETWORK, state, processedLogFiles.netlog.map((file, i) => Sidebar.getNetlogFileNode(file, props, i)));
     Sidebar.setChildNodes(NODE_ID.MOBILE, state, processedLogFiles.mobile.map((file) => Sidebar.getFileNode(file, props)));
-    Sidebar.setChildNodes(NODE_ID.TRACE, state, processedLogFiles.trace.map((file) => Sidebar.getStateFileNode(file, props)));
 
 
     return { nodes: state.nodes };
@@ -206,8 +195,6 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
       label = 'Environment';
     } else if (file.fileName.endsWith('local-settings.json')) {
       label = 'Local Settings';
-    } else if (file.fileName.endsWith('.trace')) {
-      label = 'Performance Profile';
     } else {
       const nameMatch = file.fileName.match(/slack-(\w*)/);
       label = nameMatch && nameMatch.length > 1 ? nameMatch[1] : file.fileName;
@@ -281,18 +268,6 @@ export class Sidebar extends React.Component<SidebarProps, SidebarState> {
     if (file.fileName.endsWith('root-state.json')) {
       const warnings = getRootStateWarnings(file);
 
-      if (warnings && warnings.length > 0) {
-        const content = warnings.join('\n');
-        return (
-          <Tooltip content={content} position={Position.RIGHT} boundary='viewport'>
-            <Icon icon='error' intent={Intent.WARNING} />
-          </Tooltip>
-        );
-      }
-    }
-
-    if (file.fileName.endsWith('.trace')) {
-      const warnings = getTraceWarnings(file);
       if (warnings && warnings.length > 0) {
         const content = warnings.join('\n');
         return (

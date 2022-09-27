@@ -68,23 +68,20 @@ export class App extends React.Component<{}, Partial<AppState>> {
     debug(`Received open-url for ${url}`);
     this.resetApp();
 
-    let isInvalid = false;
-    const stats = await fs.stat(url);
     const isZipFile = /[\s\S]*\.zip$/.test(url);
-
     if (isZipFile) {
-      await this.openZip(url);
-    } else if (stats.isDirectory()) {
-      await this.openDirectory(url);
-    } else if (stats.isFile()) {
-      await this.openSingleFile(url);
-    } else {
-      isInvalid = true;
+      return this.openZip(url);
     }
 
-    if (!isInvalid) {
-      debug(`Adding ${url} to recent documents`);
-      ipcRenderer.send('add-recent-file', url);
+    // Let's look at the url a little closer
+    const stats = await fs.stat(url);
+    if (stats.isDirectory()) {
+      return this.openDirectory(url);
+    }
+
+    // This is probably a file then
+    if (stats.isFile()) {
+      return this.openSingleFile(url);
     }
   }
 

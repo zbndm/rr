@@ -6,8 +6,7 @@ const path = require('path');
 async function compileParcel(options = {}) {
   const entryFiles = [
     path.join(__dirname, '../static/index.html'),
-    path.join(__dirname, '../src/main/index.ts'),
-    path.join(__dirname, '../node_modules/source-map/lib/mappings.wasm'),
+    path.join(__dirname, '../src/main/index.ts')
   ]
 
   if (options.production) {

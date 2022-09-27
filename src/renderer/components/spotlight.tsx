@@ -43,6 +43,7 @@ export const filterItem: ItemPredicate<SpotlightItem> = (query, item) => {
 };
 
 export interface SpotlightState {
+  isCooperButtonLoading: boolean;
   isOpen: boolean;
 }
 

@@ -9,29 +9,20 @@ import { getPath, showMessageBox } from './ipc';
 const debug = require('debug')('sleuth:suggestions');
 
 export async function getItemsInSuggestionFolders(): Promise<Suggestions> {
- const suggestionsArr: Array<Suggestion> = [];
+ let suggestionsArr: Array<Suggestion>;
 
   // We'll get suggestions from the downloads folder and
   // the desktop
   try {
-    try {
-      const downloadsDir = await getPath('downloads');
-      const downloads = (await fs.readdir(downloadsDir))
-        .map((file) => path.join(downloadsDir, file));
-      suggestionsArr.push(...await getSuggestions(downloads));
-    } catch (e) {
-      debug(e);
-    }
+    const downloadsDir = await getPath('downloads');
+    const downloads = (await fs.readdir(downloadsDir))
+      .map((file) => path.join(downloadsDir, file));
 
-    try {
-      const desktopDir = await getPath('desktop');
-      const desktop = (await fs.readdir(desktopDir))
-        .map((file) => path.join(desktopDir, file));
-      suggestionsArr.push(...await getSuggestions(desktop));
-    } catch (e) {
-      debug(e);
-    }
+    const desktopDir = await getPath('desktop');
+    const desktop = (await fs.readdir(desktopDir))
+      .map((file) => path.join(desktopDir, file));
 
+    suggestionsArr = (await getSuggestions(downloads)).concat(await getSuggestions(desktop));
     const sortedSuggestions  = suggestionsArr.sort((a, b) => {
       return b.mtimeMs - a.mtimeMs;
     });
@@ -57,7 +48,7 @@ export async function deleteSuggestion(filePath: string) {
   });
 
   if (response) {
-    await shell.trashItem(filePath);
+    shell.moveItemToTrash(filePath);
   }
 
   return !!response;
@@ -77,7 +68,7 @@ export async function deleteSuggestions(filePaths: Array<string>) {
   });
 
   if (response) {
-    await Promise.all(filePaths.map((filePath) => shell.trashItem(filePath)));
+    filePaths.forEach((filePath) => shell.moveItemToTrash(filePath));
   }
 
   return !!response;
@@ -101,12 +92,12 @@ async function getSuggestions(input: Array<string>): Promise<Array<Suggestion>> 
     //
     // If the file is from #alerts-ios-logs, the server will h
     // have named it T8KJ1FXTL_U8KCVGGLR_1580765146766674.txt
-    const serverFormat = /\w{9,}_\w{9,}_\d{13,}(?:_\d)?\.(zip|txt)/;
+    const serverFormat = /\w{9,}_\w{9,}_\d{16,}\.(zip|txt)/;
     const logsFormat = /.*logs.*\.zip/;
-    const iosLogsFormat = /(utf-8'')?Default_(.){0,14}(\.txt$)/;
+    const iosLogsFormat = /Default_logs?.{0,5}.txt/;
     const androidLogsFormat = /attachment?.{0,5}.txt/;
     const chromeLogsFormat = /app\.slack\.com\-\d{13,}\.log/;
-    const firefoxLogsFormat = /console(-export)?[\d\-\_]{0,22}\.(txt|log)/;
+    const firefoxLogsFormat = /console-export-[\d\-\_]{12,}\.txt/;
     const shouldAdd = logsFormat.test(file)
     || serverFormat.test(file)
     || iosLogsFormat.test(file)
